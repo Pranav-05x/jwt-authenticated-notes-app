@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notes App</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+    <h2>Notes App</h2>
+
+   <div style="display:flex;justify-content:space-around;">
+        <div style="flex:1" id="notelist">
+            Loading...
+        </div>
+
+        <div style="flex:1">
+
+            <input
+                type="text"
+                id="inputnote"
+                placeholder="Enter a note"
+            >
+
+            <button onclick="addNote()">Submit</button>
+        </div>
+
+    </div>
+    <script>
+
+        async function getNote() {
+          
+
+            const token = localStorage.getItem("token");
+
+            const response = await axios.get(
+                "http://localhost:3000/notes",
+                {
+                    headers: {
+                        token: token
+                    }
+                }
+            );
+
+            const notes = response.data.notes;
+
+            document.getElementById("notelist").innerHTML = "";
+
+            for (let i = 0; i < notes.length; i++) {
+                document.getElementById("notelist").innerHTML +=
+                    "<div>" + notes[i].note + "</div>";
+            }
+        }
+
+        async function addNote() {
+            const note = document.getElementById("inputnote").value;
+
+            if (!note) {
+                alert("Please enter a note");
+                return;
+            }
+            
+            const token = localStorage.getItem("token");
+
+                await axios.post(
+                    "http://localhost:3000/notes",
+                    {
+                        note: note
+                    },
+                    {
+                        headers: {
+                            token: token
+                        }
+                    }
+                );
+
+            document.getElementById("inputnote").value = "";
+
+            await getNote();
+        }
+
+        getNote();
+    </script>
+
+</body>
+</html>
